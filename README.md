@@ -1,7 +1,7 @@
 # MOTH
 Basic token based authentication server
 
-# Module components
+## Components
 
 ### CLI
 The MOTH CLI is very limited and only contains two commands.
@@ -24,7 +24,7 @@ There are 3 primary functions included:
 + `make_db` takes a path and creates a new database file at it if a database is not already present there. It will return if a new databse was created or not.
 + `reset_db` takes a path to an existing database file and resets if it is present. It will not create a new database. It will return if it reset the database.
 
-# API
+## API
 Note that while these docs cover the server API, the `moth.moth.Moth` class functions take the same names and parameters. For example, sending `{"token"="TOKEN"}` to `/logout` is equivalent to running `logout(token="TOKEN")`.<br>
 The largest difference is that non-200 return codes are replaced with exceptions. The only return code that does not have an exception analogue is `400 Missing request parameters`. All server end points are capable of responding with it.<br>
 Many methods return either `401 Token expired` or `moth.utils.TokenExpiredError`. This indicates that a token *did* exist, but has expired. This also means that the token has been cleaned up, and subsequent identical calls will return `401 Token does not exist` or `moth.utils.InvalidTokenError`.
