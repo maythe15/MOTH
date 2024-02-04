@@ -32,7 +32,7 @@ class App:
                     state=sqlalchemy.select(utils.User).where(utils.User.username==username)
                     result=session.scalars(state).one()
                     if not result:
-                        return Response("Unknown username", 401)
+                        return Response("User does not exist", 401)
                     password_good=bcrypt.checkpw(bytes(passw,'utf8'),bytes(result.password,'utf8'))
                     if not password_good:
                         return Response("Invalid password", 401)
