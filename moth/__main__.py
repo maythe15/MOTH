@@ -2,8 +2,8 @@ if __name__=='__main__':
     import argparse
     import sqlalchemy
     import sqlalchemy_utils
-    import moth.utils
-    import moth.server
+    import moth.utils as utils
+    import moth.server as server
     import sqlalchemy.orm as orm
     import sys
     parser = argparse.ArgumentParser()
