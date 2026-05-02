@@ -65,9 +65,12 @@ class InvalidTokenError(MOTHException):
     pass
 
 
-class TokenExpiredError(MOTHException):
+class TokenExpiredError(InvalidTokenError):
     pass
 
 
 class UserExistsError(MOTHException):
+    pass
+
+class ServerError(MOTHException):
     pass
