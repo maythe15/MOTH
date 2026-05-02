@@ -17,6 +17,10 @@ Both take a database path and a server port, with the difference being that `run
 This is an alternate method of accessing MOTH without the use of the server accessible through the `moth.moth.Moth` class.<br>
 The functions in this class mirror the API endpoints of `moth.server`.
 
+### Client
+A mirror of the `moth.moth` accessor class that connects to an instance of the server from `moth.server`.
+All responses, including exceptions, are the same as in `moth.moth`, except for `moth.utils.ServerError`, a generic error raised when the server responds unexpectedly.
+
 ### Utils
 This is a collection of MOTH utilities, exceptions, and other internal classes accessible through `moth.utils`.<br>
 There are 3 primary functions included:
@@ -34,7 +38,6 @@ Many methods return either `401 Token expired` or `moth.utils.TokenExpiredError`
 + `password`: The password of the user account
 + `token`: An access token associated with an account
 + `userid` or `id`: An internal unique incremental ID associated with each account
-+ `permissions`: A miscellaneous convenience string. This is not used within MOTH itself.
 + `expires`: A unix timestamp at which the associated token expires.
 + `valid`: A boolean stating if the requested resource is valid or not.
 + `deleted`: A boolean stating if the requested resource has been successfuly deleted.
@@ -45,7 +48,7 @@ Many methods return either `401 Token expired` or `moth.utils.TokenExpiredError`
 Create and return a user token.<br>
 Equivalent method: `login`<br>
 Takes: `username, password`<br>
-Returns: `token, userid, username, permissions, expires`<br>
+Returns: `token, userid, username, expires`<br>
 Error codes:<br>
 + `401 User does not exist` or `moth.utils.NoUserError`: User does not exist.
 + `401 Invalid password` or `moth.utils.InvalidPasswordError`: User is valid but the provided password does not match.
@@ -54,7 +57,7 @@ Error codes:<br>
 Validate that a token exists.<br>
 Equivalent method: `validate`<br>
 Takes: `token`<br>
-Returns `valid, userid, username, permissions, expires`<br>
+Returns `valid, userid, username, expires`<br>
 Error codes:
 + `401 Token does not exist` or `moth.utils.InvalidTokenError`: Token does not exist.
 + `401 Token expired` or `moth.utils.TokenExpiredError`: Token has expired.
@@ -78,8 +81,8 @@ Error codes:
 ### /new [PUT]
 Create a new user.<br>
 Equivalent method: `newuser`<br>
-Takes: `username, password, permissions`<br>
-Returns: `userid, username, permissions`<br>
+Takes: `username, password`<br>
+Returns: `userid, username`<br>
 Error codes:<br>
 + `409 User already exists` or `moth.utils.UserExistsError`: User already exists.
 
@@ -99,14 +102,6 @@ Returns: `updated`<br>
 Error codes:<br>
 + `401 User does not exist` or `moth.utils.NoUserError`: User does not exist.
 
-### /setperms [PATCH]
-Update a users permission string.<br>
-Equivalent method: `newperms`<br>
-Takes: `id, permissions`<br>
-Returns: `updated`<br>
-Error codes:<br>
-+ `401 User does not exist` or `moth.utils.NoUserError`: User does not exist.
-
 ### /gettokens [GET]
 Check how many tokens a user has.<br>
 Equivalent method: `gettokens`<br>
@@ -118,14 +113,14 @@ Error codes:
 Retrieve a list of users.<br>
 Equivalent method: `getusers`<br>
 Takes: <br>
-Returns: `[id, username, permissions]`<br>
+Returns: `[id, username]`<br>
 Error codes:
 
 ### /getuser [GET]
 Retrieve information about a specific user.<br>
 Equivalent method: `getuser`<br>
 Takes: `id`<br>
-Returns: `id, username, permissions`<br>
+Returns: `id, username`<br>
 Error codes:
 + `401 User does not exist` or `moth.utils.NoUserError`: User does not exist.
 
