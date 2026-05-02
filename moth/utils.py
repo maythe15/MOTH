@@ -38,7 +38,6 @@ class Base(orm.DeclarativeBase):
 class User(Base):
     __tablename__ = "users"
     id: orm.Mapped[int] = orm.mapped_column(sqlalchemy.Integer, primary_key=True, autoincrement=True, nullable=False)
-    permissions: orm.Mapped[str] = orm.mapped_column(sqlalchemy.String, nullable=False)
     password: orm.Mapped[str] = orm.mapped_column(sqlalchemy.String, nullable=False)
     username: orm.Mapped[str] = orm.mapped_column(sqlalchemy.String, unique=True, nullable=False)
 

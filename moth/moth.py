@@ -27,7 +27,7 @@ class Moth:
             token = utils.Token(id=result.id, token=token_str.decode('utf8'), expires=round(time.time())+259200)
             session.add(token)
             session.commit()
-            return {'token':token_str.decode('utf8'), 'userid':result.id, 'username':result.username, 'permissions':result.permissions, 'expires':token.expires}
+            return {'token':token_str.decode('utf8'), 'userid':result.id, 'username':result.username, 'expires':token.expires}
 
     def validate(self, token):
         with orm.Session(self.engine) as session:
@@ -44,7 +44,7 @@ class Moth:
             #fetch the user and give some info
             state = sqlalchemy.select(utils.User).where(utils.User.id == result.id)
             user=session.scalars(state).one()
-            return {'valid':True, 'userid':user.id, 'username':user.username, 'permissions':user.permissions, 'expires':result.expires}
+            return {'valid':True, 'userid':user.id, 'username':user.username, 'expires':result.expires}
 
     def logout(self, token):
         with orm.Session(self.engine) as session:
@@ -66,16 +66,16 @@ class Moth:
             result=result[0]
             return {'valid':bcrypt.checkpw(bytes(password,'utf8'),bytes(result.password,'utf8'))}
 
-    def newuser(self, username, passw, permissions):
+    def newuser(self, username, passw):
         with orm.Session(self.engine) as session:
             password = bcrypt.hashpw(bytes(passw, 'utf8'), bcrypt.gensalt())
-            user = utils.User(username=username, permissions=permissions, password=password.decode('utf8'))
+            user = utils.User(username=username, password=password.decode('utf8'))
             session.add(user)
             try:
                 session.commit()
             except sqlalchemy.exc.IntegrityError:
                 raise utils.UserExistsError(f'User {username} already exists')
-            return {'userid':user.id, 'username':user.username, 'permissions':user.permissions}
+            return {'userid':user.id, 'username':user.username, }
 
     def deluser(self, id):
         with orm.Session(self.engine) as session:
@@ -104,29 +104,18 @@ class Moth:
             session.commit()
             return {'updated': True}
 
-    def newperms(self, id, permissions):
-        with orm.Session(self.engine) as session:
-            state = sqlalchemy.select(utils.User).where(utils.User.id == id)
-            result = session.scalars(state).all()
-            if not result:
-                raise utils.NoUserError(f"User does not exist")
-            user=result[0]
-            user.password=permissions
-            session.commit()
-            return {'updated': True}
-
     def gettokens(self, id):
         with orm.Session(self.engine) as session:
             state = sqlalchemy.select(utils.Token).where(utils.Token.id == id)
             result = len(session.scalars(state).all())
-            {'count': result}
+            return {'count': result}
 
     def getusers(self):
             with orm.Session(self.engine) as session:
                 state = sqlalchemy.select(utils.User)
                 result=[]
                 for i in session.scalars(state).all():
-                    result.append({'id':i.id, 'username':i.username, 'permissions':i.permissions})
+                    result.append({'id':i.id, 'username':i.username})
                 return result
 
     def getuser(self, id):
@@ -137,7 +126,7 @@ class Moth:
                 i=i[0]
             else:
                 raise utils.NoUserError(f"User does not exist")
-            return {'id':i.id, 'username':i.username, 'permissions':i.permissions}
+            return {'id':i.id, 'username':i.username}
 
     def deltokens(self, id):
         with orm.Session(self.engine) as session:

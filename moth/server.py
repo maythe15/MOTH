@@ -41,7 +41,7 @@ class App:
                     token = utils.Token(id=result.id, token=token_str.decode('utf8'), expires=round(time.time())+259200)
                     session.add(token)
                     session.commit()
-                    return Response(json.dumps({'token':token_str.decode('utf8'), 'userid':result.id, 'username':result.username, 'permissions':result.permissions, 'expires':token.expires}), 200)
+                    return Response(json.dumps({'token':token_str.decode('utf8'), 'userid':result.id, 'username':result.username, 'expires':token.expires}), 200)
     
         @app.route("/validate", methods=['GET'])
         def validate():
@@ -64,7 +64,7 @@ class App:
                     #fetch the user and give some info
                     state = sqlalchemy.select(utils.User).where(utils.User.id == result.id)
                     user=session.scalars(state).one()
-                    returncode=json.dumps({'valid':True, 'userid':user.id, 'username':user.username, 'permissions':user.permissions, 'expires':result.expires})
+                    returncode=json.dumps({'valid':True, 'userid':user.id, 'username':user.username, 'expires':result.expires})
                     return Response(returncode, 200, content_type='JSON')
 
         @app.route('/passvalid', methods=['GET'])
@@ -108,18 +108,17 @@ class App:
                 try:
                     username = request.json['username']
                     passw = request.json['password']
-                    permissions=request.json['permissions']
                 except Exception:
                     return Response('Missing request parameters',400)
                 with orm.Session(self.engine) as session:
                     password = bcrypt.hashpw(bytes(passw, 'utf8'), bcrypt.gensalt())
-                    user = utils.User(username=username, permissions=permissions, password=password.decode('utf8'))
+                    user = utils.User(username=username, password=password.decode('utf8'))
                     session.add(user)
                     try:
                         session.commit()
                     except sqlalchemy.exc.IntegrityError:
                         return Response("User already exists", 409)
-                    return Response(json.dumps({'userid':user.id, 'username':user.username, 'permissions':user.permissions}), 200, content_type='JSON')
+                    return Response(json.dumps({'userid':user.id, 'username':user.username}), 200, content_type='JSON')
     
         @app.route('/del', methods=['DELETE'])
         def deluser():
@@ -161,24 +160,6 @@ class App:
                     session.commit()
                     return Response(json.dumps({'updated': True}), 200, content_type='JSON')
     
-        @app.route('/setperms', methods=['PATCH'])
-        def newperms():
-            if request.method=='PATCH':
-                try:
-                    id = request.json['id']
-                    permissions = request.json['permissions']
-                except Exception:
-                    return Response('Missing request parameters',400)
-                with orm.Session(self.engine) as session:
-                    state = sqlalchemy.select(utils.User).where(utils.User.id == id)
-                    result = session.scalars(state).all()
-                    if not result:
-                        return Response("User does not exist", 401)
-                    user=result[0]
-                    user.password=permissions
-                    session.commit()
-                    return Response(json.dumps({'updated': True}), 200, content_type='JSON')
-    
         @app.route('/gettokens', methods=['GET'])
         def gettokens():
             if request.method=='GET':
@@ -198,7 +179,7 @@ class App:
                     state = sqlalchemy.select(utils.User)
                     result=[]
                     for i in session.scalars(state).all():
-                        result.append({'id':i.id, 'username':i.username, 'permissions':i.permissions})
+                        result.append({'id':i.id, 'username':i.username})
                     return Response(json.dumps(result), 200, content_type='JSON')
     
         @app.route('/getuser', methods=['GET'])
@@ -215,7 +196,7 @@ class App:
                         i=i[0]
                     else:
                         return Response("User does not exist", 401)
-                    return Response(json.dumps({'id':i.id, 'username':i.username, 'permissions':i.permissions}), 200, content_type='JSON')
+                    return Response(json.dumps({'id':i.id, 'username':i.username}), 200, content_type='JSON')
     
         @app.route('/deltokens', methods=['DELETE'])
         def deltokens():
