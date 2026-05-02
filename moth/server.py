@@ -12,6 +12,7 @@ import sqlalchemy.exc
 import moth.utils as utils
 
 #app class
+#todo: make this use the proper Moth class in the background
 class App:
     def __init__(self, path):
         self.path=path
